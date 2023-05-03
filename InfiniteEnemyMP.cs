@@ -10,6 +10,13 @@ using Il2Cppnewdata_H;
 namespace infinite_enemy_mp;
 public class InfiniteEnemyMP : MelonMod
 {
+    static public List<ushort> bossesWithMana = new List<ushort>()
+    {
+        273, // Specter 2
+        299, // Sakahagi 1
+        355  // Sakahagi 2
+    };
+
     // After skill was used during battle
     [HarmonyPatch(typeof(nbActionProcess), nameof(nbActionProcess.MAKE_SKILL_SE01))]
     private class Patch
@@ -18,7 +25,10 @@ public class InfiniteEnemyMP : MelonMod
         {
             foreach (datUnitWork_t unit in nbMainProcess.nbGetMainProcessData().enemyunit)
             {
-                unit.mp = unit.maxmp;
+                if (!bossesWithMana.Contains(unit.id))
+                {
+                    unit.mp = unit.maxmp;
+                }
             }
         }
     }
