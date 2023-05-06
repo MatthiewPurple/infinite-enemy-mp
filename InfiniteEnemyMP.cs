@@ -2,7 +2,6 @@
 using HarmonyLib;
 using Il2Cpp;
 using infinite_enemy_mp;
-using Il2Cppnewdata_H;
 
 [assembly: MelonInfo(typeof(InfiniteEnemyMP), "Infinite Enemy MP", "1.0.0", "Matthiew Purple")]
 [assembly: MelonGame("アトラス", "smt3hd")]
@@ -10,26 +9,22 @@ using Il2Cppnewdata_H;
 namespace infinite_enemy_mp;
 public class InfiniteEnemyMP : MelonMod
 {
+    // List of demons that should be able to run out of MP
     static public List<ushort> bossesWithMana = new List<ushort>()
     {
         273, // Specter 2
-        299, // Sakahagi 1
-        355  // Sakahagi 2
+        299, // Sakahagi
+        355  // Sakahagi
     };
 
-    // After skill was used during battle
-    [HarmonyPatch(typeof(nbActionProcess), nameof(nbActionProcess.MAKE_SKILL_SE01))]
+    // Before removing HP or MP from someone during combat
+    [HarmonyPatch(typeof(nbCalc), nameof(nbCalc.nbAddHpMp))]
     private class Patch
     {
-        public static void Postfix()
+        public static void Prefix(ref int formindex, ref int type, ref int n)
         {
-            foreach (datUnitWork_t unit in nbMainProcess.nbGetMainProcessData().enemyunit)
-            {
-                if (!bossesWithMana.Contains(unit.id))
-                {
-                    unit.mp = unit.maxmp;
-                }
-            }
+            // If an enemy demon is about to lose MP
+            if (formindex >= 4 && type == 1 && n < 0) n = 0; // Doesn't lose any MP
         }
     }
 }
