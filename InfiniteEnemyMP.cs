@@ -23,8 +23,8 @@ public class InfiniteEnemyMP : MelonMod
     {
         public static void Prefix(ref int formindex, ref int type, ref int n)
         {
-            // If an enemy demon is about to lose MP
-            if (formindex >= 4 && type == 1 && n < 0) n = 0; // Doesn't lose any MP
+            // If an enemy (that shouldn't be able to run out of MP) is about to lose MP
+            if (formindex >= 4 && !bossesWithMana.Contains(nbMainProcess.nbGetUnitWorkFromFormindex(formindex).id) && type == 1 && n < 0) n = 0; // Makes it lose 0 MP
         }
     }
 }
